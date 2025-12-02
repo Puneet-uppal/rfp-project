@@ -356,24 +356,29 @@ Return ONLY the JSON object.`;
 RFP DETAILS:
 Title: ${rfp.title}
 Description: ${rfp.description}
-Budget: ${rfp.budget ? `${rfp.currency || ''} ${rfp.budget}` : 'To be quoted'}
+Budget: ${rfp.budget ? `${rfp.currency || ''} ${rfp.budget.toLocaleString()}` : 'To be quoted'}
 Deadline: ${rfp.deadline || 'As soon as possible'}
 Delivery Required: ${rfp.deliveryDays ? `Within ${rfp.deliveryDays} days` : 'To be proposed'}
 Payment Terms: ${rfp.paymentTerms || 'Standard terms acceptable'}
 Warranty Required: ${rfp.warrantyTerms || 'Please specify'}
 
 Items Required:
-${rfp.items.map((item, i) => `${i + 1}. ${item.name} - Qty: ${item.quantity}${item.specifications ? ` - Specs: ${JSON.stringify(item.specifications)}` : ''}`).join('\n')}
+${rfp.items.map((item, i) => `${i + 1}. ${item.name} - Qty: ${item.quantity}${item.specifications && Object.keys(item.specifications).length > 0 ? ` - Specs: ${JSON.stringify(item.specifications)}` : ''}`).join('\n')}
 
 ${rfp.additionalRequirements ? `Additional Requirements: ${JSON.stringify(rfp.additionalRequirements)}` : ''}
 
-The email should be professional, clear, and include all relevant details.
-Do not use placeholder text like [Your Name].
+IMPORTANT FORMATTING RULES:
+- Write in PLAIN TEXT only. Do NOT use any markdown formatting.
+- Do NOT use asterisks (**), underscores, or any special formatting characters.
+- Use simple numbered lists (1. 2. 3.) without bold or italic.
+- Keep the email clean, professional, and easy to read.
+- Do not use placeholder text like [Your Name].
+- Sign off as "Procurement Team" or "Regards, Procurement Team".
 
 Return a JSON object:
 {
   "subject": "Email subject line",
-  "body": "Full email body"
+  "body": "Full email body in plain text without any markdown"
 }
 
 Return ONLY the JSON object.`;
