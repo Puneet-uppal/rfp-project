@@ -74,31 +74,58 @@ export class AiService {
     }
   }
 
-  private async generateJSON<T>(prompt: string): Promise<T> {
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async generateJSON<T>(prompt: string, maxRetries = 5): Promise<T> {
     if (!this.genAI) {
       throw new Error('Gemini API not configured');
     }
 
     const model = this.genAI.getGenerativeModel({ model: this.model });
     
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    let lastError: Error | null = null;
     
-    // Extract JSON from response (handle markdown code blocks)
-    let jsonStr = text;
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (jsonMatch) {
-      jsonStr = jsonMatch[1].trim();
-    } else {
-      // Try to find JSON object directly
-      const objMatch = text.match(/\{[\s\S]*\}/);
-      if (objMatch) {
-        jsonStr = objMatch[0];
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
+        
+        // Extract JSON from response (handle markdown code blocks)
+        let jsonStr = text;
+        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          jsonStr = jsonMatch[1].trim();
+        } else {
+          // Try to find JSON object directly
+          const objMatch = text.match(/\{[\s\S]*\}/);
+          if (objMatch) {
+            jsonStr = objMatch[0];
+          }
+        }
+        
+        return JSON.parse(jsonStr) as T;
+      } catch (error) {
+        lastError = error;
+        
+        // Check if it's a rate limit error (429)
+        const errorMessage = error.message || '';
+        if (errorMessage.includes('429') || errorMessage.includes('Too Many Requests') || errorMessage.includes('Resource exhausted')) {
+          const backoffSchedule = [1000, 30000, 60000, 90000]; // 1s, 30s, 60s, 90s
+          const backoffMs = backoffSchedule[Math.min(attempt, backoffSchedule.length - 1)]; // Cap at 90s
+          this.logger.warn(`Rate limited (attempt ${attempt + 1}/${maxRetries}). Retrying in ${backoffMs / 1000}s...`);
+          await this.sleep(backoffMs);
+        } else {
+          // For non-rate-limit errors, throw immediately
+          throw error;
+        }
       }
     }
     
-    return JSON.parse(jsonStr) as T;
+    this.logger.error(`Failed after ${maxRetries} attempts due to rate limiting`);
+    throw lastError;
   }
 
   /**
