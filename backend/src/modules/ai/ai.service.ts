@@ -196,30 +196,39 @@ ${emailBody}
 
 ${attachmentContents.length > 0 ? `ATTACHMENT CONTENTS:\n${attachmentContents.join('\n\n---\n\n')}` : ''}
 
+IMPORTANT PARSING RULES FOR PRICES:
+1. "totalPrice" must be the GRAND TOTAL / FINAL AMOUNT for the entire proposal, not individual item prices.
+2. Look for keywords like: "Total", "Grand Total", "Final Amount", "Total Cost", "Quote Total", "Net Amount".
+3. For each item, "unitPrice" is the price PER UNIT and "totalPrice" is unitPrice × quantity.
+4. Do NOT confuse phone numbers, dates, reference numbers, or GST/tax numbers with prices.
+5. Prices usually have currency symbols (₹, $, €) or words like "INR", "USD", "Rs" near them.
+6. If you cannot find a clear total price, calculate it by summing all item totals.
+7. If prices are ambiguous or unclear, set confidence score lower.
+
 Extract and return a JSON object with this structure:
 {
-  "totalPrice": number or null,
-  "currency": "currency code as mentioned in the proposal (e.g., USD, EUR, INR)" or null,
+  "totalPrice": number (GRAND TOTAL of entire proposal) or null if not found,
+  "currency": "currency code (USD, EUR, INR, etc.)" or null,
   "deliveryDays": number or null,
   "paymentTerms": "string" or null,
   "warrantyTerms": "string" or null,
   "validityPeriod": "string" or null,
   "items": [
     {
-      "name": "string",
-      "description": "string",
+      "name": "item name matching RFP items",
+      "description": "detailed description",
       "quantity": number,
-      "unitPrice": number or null,
-      "totalPrice": number or null,
+      "unitPrice": number (price per single unit) or null,
+      "totalPrice": number (unitPrice × quantity) or null,
       "specifications": { "key": "value" }
     }
   ],
   "additionalTerms": { "key": "value" } or null,
-  "summary": "Brief summary of the proposal",
-  "confidence": number (0-100, your confidence in parsing accuracy)
+  "summary": "Brief summary of the proposal including key pricing info",
+  "confidence": number (0-100, lower if prices are unclear or ambiguous)
 }
 
-Match items to RFP items where possible. Return ONLY the JSON object.`;
+Match items to RFP items. Verify that item totalPrice = unitPrice × quantity. Return ONLY the JSON object.`;
 
     try {
       return await this.generateJSON<ParsedProposal>(prompt);
