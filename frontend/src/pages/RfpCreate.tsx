@@ -342,7 +342,7 @@ export default function RfpCreate() {
               {parsedRfp.budget && (
                 <div className="p-3 bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg border border-emerald-100">
                   <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">Budget</p>
-                  <p className="font-bold text-emerald-700 text-lg">${parsedRfp.budget.toLocaleString()}</p>
+                  <p className="font-bold text-emerald-700 text-lg">{parsedRfp.currency || ''} {parsedRfp.budget.toLocaleString()}</p>
                 </div>
               )}
               {parsedRfp.deliveryDays && (

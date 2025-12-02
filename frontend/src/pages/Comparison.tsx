@@ -160,7 +160,7 @@ export default function Comparison() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="font-medium">{proposal.totalPrice ? `$${Number(proposal.totalPrice).toLocaleString()}` : '-'}</p>
+                    <p className="font-medium">{proposal.totalPrice ? `${proposal.currency || comparison.rfp.currency || ''} ${Number(proposal.totalPrice).toLocaleString()}` : '-'}</p>
                     {comparison.rfp.budget && proposal.totalPrice && (
                       <p className={`text-xs ${Number(proposal.totalPrice) <= Number(comparison.rfp.budget) ? 'text-green-600' : 'text-red-600'}`}>
                         {((Number(proposal.totalPrice) / Number(comparison.rfp.budget)) * 100).toFixed(0)}% of budget

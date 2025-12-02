@@ -33,6 +33,7 @@ import { AiModule } from './modules/ai/ai.module';
         models: [Rfp, RfpItem, Vendor, RfpVendor, Proposal, ProposalItem],
         autoLoadModels: true,
         synchronize: process.env.NODE_ENV === 'development',
+        sync: { alter: process.env.NODE_ENV === 'development' },
         logging: process.env.NODE_ENV === 'development' ? console.log : false,
       }),
       inject: [ConfigService],

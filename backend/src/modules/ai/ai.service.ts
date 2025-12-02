@@ -115,7 +115,7 @@ Extract and return a JSON object with this exact structure:
   "title": "A concise title for the RFP",
   "description": "Clear description of what is being procured",
   "budget": number or null,
-  "currency": "USD" (or appropriate currency code),
+  "currency": "currency code as mentioned by user (e.g., USD, EUR, GBP, INR, etc.)" or null if not specified,
   "deadline": "YYYY-MM-DD" or null,
   "deliveryDays": number or null,
   "paymentTerms": "string" or null,
@@ -133,7 +133,7 @@ Extract and return a JSON object with this exact structure:
   "summary": "A brief professional summary for sending to vendors"
 }
 
-Be thorough in extracting specifications. If currency is not specified, default to USD.
+Be thorough in extracting specifications. IMPORTANT: Extract the currency exactly as the user specifies it (e.g., $=USD, ₹=INR, €=EUR, £=GBP, ¥=JPY). If the user uses currency symbols like $, ₹, €, £, convert them to their ISO currency codes. If no currency is mentioned at all, leave currency as null.
 Return ONLY the JSON object, no additional text.`;
 
     try {
@@ -160,7 +160,7 @@ Return ONLY the JSON object, no additional text.`;
 
 RFP CONTEXT:
 Title: "${rfpContext.title}"
-Budget: ${rfpContext.budget ? `$${rfpContext.budget}` : 'Not specified'}
+Budget: ${rfpContext.budget ? `${rfpContext.budget}` : 'Not specified'}
 Items Required:
 ${JSON.stringify(rfpContext.items, null, 2)}
 
@@ -172,7 +172,7 @@ ${attachmentContents.length > 0 ? `ATTACHMENT CONTENTS:\n${attachmentContents.jo
 Extract and return a JSON object with this structure:
 {
   "totalPrice": number or null,
-  "currency": "USD",
+  "currency": "currency code as mentioned in the proposal (e.g., USD, EUR, INR)" or null,
   "deliveryDays": number or null,
   "paymentTerms": "string" or null,
   "warrantyTerms": "string" or null,
@@ -220,7 +220,7 @@ Match items to RFP items where possible. Return ONLY the JSON object.`;
 
 RFP REQUIREMENTS:
 Title: ${rfpContext.title}
-Budget: ${rfpContext.budget ? `$${rfpContext.budget}` : 'Not specified'}
+Budget: ${rfpContext.budget ? `${rfpContext.budget}` : 'Not specified'}
 Required Delivery: ${rfpContext.deliveryDays ? `${rfpContext.deliveryDays} days` : 'Not specified'}
 Payment Terms: ${rfpContext.paymentTerms || 'Not specified'}
 Warranty Required: ${rfpContext.warrantyTerms || 'Not specified'}
@@ -285,7 +285,7 @@ Return ONLY the JSON object.`;
     const prompt = `You are an expert procurement advisor. Compare these vendor proposals and recommend the best option.
 
 RFP: ${rfpContext.title}
-Budget: ${rfpContext.budget ? `$${rfpContext.budget}` : 'Not specified'}
+Budget: ${rfpContext.budget ? `${rfpContext.budget}` : 'Not specified'}
 ${rfpContext.priorities ? `Priorities: ${rfpContext.priorities.join(', ')}` : ''}
 
 PROPOSALS AND EVALUATIONS:
@@ -329,7 +329,7 @@ Return ONLY the JSON object.`;
 RFP DETAILS:
 Title: ${rfp.title}
 Description: ${rfp.description}
-Budget: ${rfp.budget ? `$${rfp.budget}` : 'To be quoted'}
+Budget: ${rfp.budget ? `${rfp.currency || ''} ${rfp.budget}` : 'To be quoted'}
 Deadline: ${rfp.deadline || 'As soon as possible'}
 Delivery Required: ${rfp.deliveryDays ? `Within ${rfp.deliveryDays} days` : 'To be proposed'}
 Payment Terms: ${rfp.paymentTerms || 'Standard terms acceptable'}

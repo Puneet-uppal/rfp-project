@@ -233,7 +233,7 @@ export class ProposalService implements OnModuleInit {
   ): Promise<void> {
     await proposal.update({
       totalPrice: parsedData.totalPrice,
-      currency: parsedData.currency || 'USD',
+      currency: parsedData.currency || rfp.currency,
       deliveryDays: parsedData.deliveryDays,
       paymentTerms: parsedData.paymentTerms,
       warrantyTerms: parsedData.warrantyTerms,
@@ -346,7 +346,7 @@ export class ProposalService implements OnModuleInit {
         rfpId,
         vendorId,
         totalPrice: data.totalPrice,
-        currency: data.currency || 'USD',
+        currency: data.currency || rfp.currency,
         deliveryDays: data.deliveryDays,
         paymentTerms: data.paymentTerms,
         warrantyTerms: data.warrantyTerms,
@@ -356,7 +356,7 @@ export class ProposalService implements OnModuleInit {
     } else {
       await proposal.update({
         totalPrice: data.totalPrice,
-        currency: data.currency || 'USD',
+        currency: data.currency || rfp.currency,
         deliveryDays: data.deliveryDays,
         paymentTerms: data.paymentTerms,
         warrantyTerms: data.warrantyTerms,

@@ -50,8 +50,8 @@ export class EmailService extends EventEmitter implements OnModuleInit {
 
   async onModuleInit() {
     await this.initializeSmtp();
-    // IMAP polling can be started manually or automatically
-    // this.startImapPolling(); // Uncomment to auto-start
+    // IMAP polling starts automatically on server start
+    this.startImapPolling();
   }
 
   private async initializeSmtp() {

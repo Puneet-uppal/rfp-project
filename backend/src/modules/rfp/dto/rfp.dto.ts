@@ -70,6 +70,12 @@ export class CreateRfpDto {
   @IsNumber()
   budget?: number;
 
+  @ApiPropertyOptional({ description: 'Currency code', example: 'USD' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  currency?: string;
+
   @ApiPropertyOptional({ description: 'Deadline date', example: '2024-03-15' })
   @IsOptional()
   @IsDateString()
@@ -120,6 +126,12 @@ export class UpdateRfpDto {
   @IsOptional()
   @IsNumber()
   budget?: number;
+
+  @ApiPropertyOptional({ description: 'Currency code' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  currency?: string;
 
   @ApiPropertyOptional({ description: 'Deadline date' })
   @IsOptional()
@@ -193,6 +205,9 @@ export class RfpResponseDto {
 
   @ApiPropertyOptional()
   budget?: number;
+
+  @ApiPropertyOptional()
+  currency?: string;
 
   @ApiPropertyOptional()
   deadline?: Date;

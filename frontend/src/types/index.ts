@@ -64,6 +64,7 @@ export interface Rfp {
   description: string;
   originalInput?: string;
   budget?: number;
+  currency?: string;
   deadline?: string;
   deliveryDays?: number;
   paymentTerms?: string;
@@ -126,6 +127,7 @@ export interface ComparisonResult {
     id: string;
     title: string;
     budget?: number;
+    currency?: string;
     deliveryDays?: number;
   };
   proposals: Array<{
@@ -133,6 +135,7 @@ export interface ComparisonResult {
     vendorName: string;
     vendorId: string;
     totalPrice?: number;
+    currency?: string;
     deliveryDays?: number;
     score?: number;
     scoreBreakdown?: Proposal['aiScoreBreakdown'];

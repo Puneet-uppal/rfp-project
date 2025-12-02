@@ -41,6 +41,9 @@ export class Rfp extends Model {
   @Column({ type: DataType.DECIMAL(15, 2), allowNull: true })
   budget?: number;
 
+  @Column({ type: DataType.STRING(10), allowNull: true })
+  currency?: string;
+
   @Column({ type: DataType.DATEONLY, allowNull: true })
   deadline?: Date;
 

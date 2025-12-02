@@ -105,7 +105,7 @@ export default function RfpList() {
                     </Link>
                   </td>
                   <td className="px-6 py-4 text-gray-600">
-                    {rfp.budget ? `$${rfp.budget.toLocaleString()}` : '-'}
+                    {rfp.budget ? `${rfp.currency || ''} ${rfp.budget.toLocaleString()}` : '-'}
                   </td>
                   <td className="px-6 py-4 text-gray-600">{rfp.items?.length || 0}</td>
                   <td className="px-6 py-4 text-gray-600">{rfp.rfpVendors?.length || 0}</td>

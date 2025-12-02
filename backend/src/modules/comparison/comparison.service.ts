@@ -163,7 +163,7 @@ export class ComparisonService {
       vendorName: p.vendor.companyName,
       proposal: {
         totalPrice: p.totalPrice,
-        currency: p.currency || 'USD',
+        currency: p.currency || rfp.currency,
         deliveryDays: p.deliveryDays,
         paymentTerms: p.paymentTerms,
         warrantyTerms: p.warrantyTerms,
