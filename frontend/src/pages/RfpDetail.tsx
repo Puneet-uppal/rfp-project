@@ -93,8 +93,8 @@ export default function RfpDetail() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="w-12 h-12 border-3 border-gray-200 border-t-slate-700 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-slate-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+              <div className="w-12 h-12 border-3 border-gray-200 border-t-primary-900 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-primary-700 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
           </div>
           <p className="text-sm text-gray-500 font-medium">Loading RFP...</p>
         </div>
@@ -119,9 +119,9 @@ export default function RfpDetail() {
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-3">{rfp.title}</h1>
           <span className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg uppercase tracking-wide ${
             rfp.status === RfpStatus.DRAFT ? 'bg-gray-100 text-gray-700' :
-            rfp.status === RfpStatus.SENT ? 'bg-slate-100 text-slate-700' :
-            rfp.status === RfpStatus.EVALUATING ? 'bg-slate-200 text-slate-800' :
-            rfp.status === RfpStatus.AWARDED ? 'bg-slate-300 text-slate-900' :
+            rfp.status === RfpStatus.SENT ? 'bg-primary-100 text-primary-800' :
+            rfp.status === RfpStatus.EVALUATING ? 'bg-primary-200 text-primary-900' :
+            rfp.status === RfpStatus.AWARDED ? 'bg-primary-300 text-primary-950' :
             'bg-gray-100 text-gray-700'
           }`}>
             {RfpStatusLabel[rfp.status] || rfp.status}
@@ -139,7 +139,7 @@ export default function RfpDetail() {
           <button
             onClick={() => setShowVendorModal(true)}
             disabled={rfp.status === RfpStatus.AWARDED}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold transition-all shadow-lg hover:shadow-xl"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-900 text-white rounded-xl hover:bg-primary-950 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             Send to Vendors
           </button>
@@ -159,15 +159,15 @@ export default function RfpDetail() {
             </h2>
             <p className="text-gray-600 leading-relaxed">{rfp.description}</p>
             {rfp.aiSummary && (
-              <div className="mt-5 p-4 bg-gradient-to-r from-slate-50 to-slate-50/50 rounded-lg border border-slate-100">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mt-5 p-4 bg-gradient-to-r from-primary-50 to-primary-50/50 rounded-lg border border-primary-100">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-primary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1">AI Summary</p>
+                      <p className="text-xs font-semibold text-primary-900 uppercase tracking-wide mb-1">AI Summary</p>
                     <p className="text-sm text-gray-700 leading-relaxed">{rfp.aiSummary}</p>
                   </div>
                 </div>
@@ -185,11 +185,11 @@ export default function RfpDetail() {
             </h2>
             <div className="space-y-4">
               {rfp.items.map((item, index) => (
-                <div key={index} className="group border border-gray-100 rounded-lg p-5 bg-gradient-to-br from-gray-50 to-white hover:border-slate-200 hover:shadow-md transition-all duration-200">
+                  <div key={index} className="group border border-gray-100 rounded-lg p-5 bg-gradient-to-br from-gray-50 to-white hover:border-primary-200 hover:shadow-md transition-all duration-200">
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-900 font-semibold text-sm">
                           {index + 1}
                         </span>
                         <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
@@ -202,7 +202,7 @@ export default function RfpDetail() {
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Specifications</p>
                           <div className="flex flex-wrap gap-2">
                             {Object.entries(item.specifications).map(([key, value]) => (
-                              <span key={key} className="inline-flex items-center text-sm bg-slate-50 text-slate-700 px-3 py-1.5 rounded-full border border-slate-100">
+                                <span key={key} className="inline-flex items-center text-sm bg-primary-50 text-primary-900 px-3 py-1.5 rounded-full border border-primary-100">
                                 <span className="font-medium">{key}:</span>
                                 <span className="ml-1">{String(value)}</span>
                               </span>
@@ -212,7 +212,7 @@ export default function RfpDetail() {
                       )}
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="inline-flex items-center px-4 py-2 bg-slate-50 text-slate-700 rounded-lg font-semibold border border-slate-100">
+                        <span className="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-900 rounded-lg font-semibold border border-primary-100">
                         <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
@@ -247,9 +247,9 @@ export default function RfpDetail() {
             ) : (
               <div className="space-y-3">
                 {rfp.rfpVendors.map((rv) => (
-                  <div key={rv.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200">
+                    <div key={rv.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold">
+                          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-900 font-semibold">
                         {rv.vendor.companyName.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -257,11 +257,11 @@ export default function RfpDetail() {
                         <p className="text-sm text-gray-500">{rv.vendor.email}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
-                      rv.status === RfpVendorStatus.RESPONDED ? 'bg-slate-200 text-slate-800' :
-                      rv.status === RfpVendorStatus.SENT ? 'bg-slate-100 text-slate-700' :
-                      'bg-gray-100 text-gray-600 border border-gray-200'
-                    }`}>
+                      <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
+                        rv.status === RfpVendorStatus.RESPONDED ? 'bg-primary-200 text-primary-900' :
+                        rv.status === RfpVendorStatus.SENT ? 'bg-primary-100 text-primary-800' :
+                        'bg-gray-100 text-gray-600 border border-gray-200'
+                      }`}>
                       {rv.status}
                     </span>
                   </div>
@@ -274,24 +274,24 @@ export default function RfpDetail() {
           {proposals.length > 0 && (
             <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
               <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-primary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Proposals ({proposals.length})
               </h2>
               <div className="space-y-3">
                 {proposals.map((proposal) => (
-                  <div key={proposal.id} className="p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200">
+                    <div key={proposal.id} className="p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all duration-200">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold">
+                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-900 font-semibold">
                           {proposal.vendor.companyName.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-900">{proposal.vendor.companyName}</p>
                           <div className="flex flex-wrap gap-3 mt-2">
                             {proposal.totalPrice && (
-                              <span className="inline-flex items-center text-sm bg-slate-50 text-slate-700 px-2.5 py-1 rounded-md">
+                              <span className="inline-flex items-center text-sm bg-primary-50 text-primary-900 px-2.5 py-1 rounded-md">
                                 <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -299,7 +299,7 @@ export default function RfpDetail() {
                               </span>
                             )}
                             {proposal.deliveryDays && (
-                              <span className="inline-flex items-center text-sm bg-slate-50 text-slate-700 px-2.5 py-1 rounded-md">
+                              <span className="inline-flex items-center text-sm bg-primary-50 text-primary-900 px-2.5 py-1 rounded-md">
                                 <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -307,7 +307,7 @@ export default function RfpDetail() {
                               </span>
                             )}
                             {proposal.aiScore && (
-                              <span className="inline-flex items-center text-sm bg-slate-50 text-slate-700 px-2.5 py-1 rounded-md">
+                              <span className="inline-flex items-center text-sm bg-primary-50 text-primary-900 px-2.5 py-1 rounded-md">
                                 <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                 </svg>
@@ -317,11 +317,11 @@ export default function RfpDetail() {
                           </div>
                         </div>
                       </div>
-                      <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
-                        proposal.status === ProposalStatus.SELECTED ? 'bg-slate-300 text-slate-900' :
-                        proposal.status === ProposalStatus.EVALUATED ? 'bg-slate-200 text-slate-800' :
-                        'bg-gray-100 text-gray-600 border border-gray-200'
-                      }`}>
+                        <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
+                          proposal.status === ProposalStatus.SELECTED ? 'bg-primary-300 text-primary-950' :
+                          proposal.status === ProposalStatus.EVALUATED ? 'bg-primary-200 text-primary-900' :
+                          'bg-gray-100 text-gray-600 border border-gray-200'
+                        }`}>
                         {proposal.status}
                       </span>
                     </div>
@@ -343,15 +343,15 @@ export default function RfpDetail() {
             </h3>
             <dl className="space-y-4">
               {rfp.budget && (
-                <div className="p-3 bg-gradient-to-r from-slate-50 to-slate-50/50 rounded-lg border border-slate-100">
-                  <dt className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Budget</dt>
-                  <dd className="font-bold text-slate-700 text-xl">{rfp.currency || ''} {rfp.budget.toLocaleString()}</dd>
+                  <div className="p-3 bg-gradient-to-r from-primary-50 to-primary-50/50 rounded-lg border border-primary-100">
+                    <dt className="text-xs font-medium text-primary-900 uppercase tracking-wide mb-1">Budget</dt>
+                    <dd className="font-bold text-primary-950 text-xl">{rfp.currency || ''} {rfp.budget.toLocaleString()}</dd>
                 </div>
               )}
               {rfp.deliveryDays && (
-                <div className="p-3 bg-gradient-to-r from-slate-50 to-slate-50/50 rounded-lg border border-slate-100">
-                  <dt className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Delivery Timeline</dt>
-                  <dd className="font-semibold text-slate-700">Within {rfp.deliveryDays} days</dd>
+                  <div className="p-3 bg-gradient-to-r from-primary-50 to-primary-50/50 rounded-lg border border-primary-100">
+                    <dt className="text-xs font-medium text-primary-900 uppercase tracking-wide mb-1">Delivery Timeline</dt>
+                    <dd className="font-semibold text-primary-950">Within {rfp.deliveryDays} days</dd>
                 </div>
               )}
               {rfp.paymentTerms && (
@@ -419,7 +419,7 @@ export default function RfpDetail() {
               <button
                 onClick={handleSendToVendors}
                 disabled={selectedVendors.length === 0 || sending}
-                className="px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold transition-all shadow-lg hover:shadow-xl"
+                  className="px-5 py-2.5 bg-primary-900 text-white rounded-xl hover:bg-primary-950 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold transition-all shadow-lg hover:shadow-xl"
               >
                 {sending ? 'Sending...' : `Send RFP (${selectedVendors.length})`}
               </button>

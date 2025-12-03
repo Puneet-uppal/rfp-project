@@ -33,9 +33,9 @@ export default function RfpList() {
   const getStatusStyle = (status: RfpStatus) => {
     switch (status) {
       case RfpStatus.DRAFT: return 'bg-gray-100 text-gray-700';
-      case RfpStatus.SENT: return 'bg-slate-100 text-slate-700';
-      case RfpStatus.EVALUATING: return 'bg-slate-200 text-slate-800';
-      case RfpStatus.AWARDED: return 'bg-slate-300 text-slate-900';
+      case RfpStatus.SENT: return 'bg-primary-100 text-primary-800';
+      case RfpStatus.EVALUATING: return 'bg-primary-200 text-primary-900';
+      case RfpStatus.AWARDED: return 'bg-primary-300 text-primary-950';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -50,7 +50,7 @@ export default function RfpList() {
         </div>
         <Link
           to="/rfps/create"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-700 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary-900 text-white text-sm font-semibold rounded-xl hover:bg-primary-950 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -72,13 +72,13 @@ export default function RfpList() {
           placeholder="Search RFPs..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-900 placeholder-gray-400 bg-white transition-all hover:border-gray-400"
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-primary-900 focus:border-primary-900 text-sm text-gray-900 placeholder-gray-400 bg-white transition-all hover:border-gray-400"
         />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-900 bg-white transition-all hover:border-gray-400 cursor-pointer font-medium"
+            className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-primary-900 focus:border-primary-900 text-sm text-gray-900 bg-white transition-all hover:border-gray-400 cursor-pointer font-medium"
         >
           <option value="">All Status</option>
           <option value="draft">Draft</option>
@@ -93,8 +93,8 @@ export default function RfpList() {
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 border-3 border-gray-200 border-t-slate-700 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-slate-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                <div className="w-12 h-12 border-3 border-gray-200 border-t-primary-900 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-primary-700 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
             </div>
             <p className="text-sm text-gray-500 font-medium">Loading RFPs...</p>
           </div>
@@ -110,7 +110,7 @@ export default function RfpList() {
           <p className="text-sm text-gray-500 mb-4">Get started by creating your first RFP</p>
           <Link 
             to="/rfps/create" 
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-900 text-white text-sm font-semibold rounded-lg hover:bg-primary-950 transition-colors"
           >
             Create RFP
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -142,7 +142,7 @@ export default function RfpList() {
                   <td className="px-6 py-4">
                       <Link 
                         to={`/rfps/${rfp.id}`} 
-                        className="text-sm font-semibold text-gray-900 hover:text-slate-600 transition-colors inline-flex items-center gap-2 group-hover:gap-2.5"
+                          className="text-sm font-semibold text-gray-900 hover:text-primary-900 transition-colors inline-flex items-center gap-2 group-hover:gap-2.5"
                         onClick={(e) => e.stopPropagation()}
                       >
                       {rfp.title}
