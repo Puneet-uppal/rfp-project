@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { rfpApi, vendorApi, proposalApi } from '../services/api';
-import { RfpStatus, RfpVendorStatus, ProposalStatus } from '../types';
+import { RfpStatus, RfpVendorStatus, ProposalStatus, RfpStatusLabel } from '../types';
 import type { Rfp, Vendor, Proposal } from '../types';
 import { format } from 'date-fns';
 
@@ -109,7 +109,7 @@ export default function RfpDetail() {
             rfp.status === RfpStatus.CLOSED ? 'bg-purple-50 text-purple-700 border-purple-400' :
             'bg-gray-50 text-gray-600 border-gray-300'
           }`}>
-            {rfp.status}
+            {RfpStatusLabel[rfp.status] || rfp.status}
           </span>
         </div>
         <div className="flex gap-2">

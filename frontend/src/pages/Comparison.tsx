@@ -11,6 +11,11 @@ export default function Comparison() {
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+  const [dealConfirm, setDealConfirm] = useState<{ show: boolean; proposalId: string | null; vendorName: string }>({
+    show: false,
+    proposalId: null,
+    vendorName: '',
+  });
 
   useEffect(() => {
     if (id) fetchData();
@@ -47,15 +52,20 @@ export default function Comparison() {
     }
   };
 
-  const handleSelectWinner = async (proposalId: string) => {
-    if (!confirm('Select this vendor as the winner?')) return;
+  const handleSelectDealClick = (proposalId: string, vendorName: string) => {
+    setDealConfirm({ show: true, proposalId, vendorName });
+  };
+
+  const handleSelectDealConfirm = async () => {
+    if (!dealConfirm.proposalId) return;
     try {
-      await proposalApi.selectWinner(proposalId);
-      toast.success('Vendor selected as winner');
+      await proposalApi.selectWinner(dealConfirm.proposalId);
+      toast.success('Deal confirmed successfully');
+      setDealConfirm({ show: false, proposalId: null, vendorName: '' });
       navigate(`/rfps/${id}`);
     } catch (error) {
-      console.error('Failed to select winner:', error);
-      toast.error('Failed to select winner');
+      console.error('Failed to confirm deal:', error);
+      toast.error('Failed to confirm deal');
     }
   };
 
@@ -187,10 +197,10 @@ export default function Comparison() {
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleSelectWinner(proposal.id)}
+                      onClick={() => handleSelectDealClick(proposal.id, proposal.vendorName)}
                       className="text-blue-600 hover:underline text-sm"
                     >
-                      Select Winner
+                      Select Deal
                     </button>
                   </td>
                 </tr>
@@ -258,6 +268,37 @@ export default function Comparison() {
           </div>
         ))}
       </div>
+
+      {/* Deal Confirmation Modal */}
+      {dealConfirm.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-green-100 rounded-full">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">Confirm Deal</h3>
+            <p className="text-gray-600 text-center mb-6">
+              Are you sure you want to select <span className="font-semibold">{dealConfirm.vendorName}</span> for this deal? This will mark them as the selected vendor.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDealConfirm({ show: false, proposalId: null, vendorName: '' })}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSelectDealConfirm}
+                className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
+                Confirm Deal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

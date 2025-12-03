@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { rfpApi } from '../services/api';
-import { RfpStatus } from '../types';
+import { RfpStatus, RfpStatusLabel } from '../types';
 import type { Rfp } from '../types';
 import { format } from 'date-fns';
 
@@ -71,7 +71,7 @@ export default function RfpList() {
           <option value="draft">Draft</option>
           <option value="sent">Sent</option>
           <option value="evaluating">Evaluating</option>
-          <option value="awarded">Awarded</option>
+          <option value="awarded">Deal Sold</option>
           <option value="closed">Closed</option>
         </select>
       </div>
@@ -111,7 +111,7 @@ export default function RfpList() {
                   <td className="px-6 py-4 text-gray-600">{rfp.rfpVendors?.length || 0}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg border-2 uppercase tracking-wide ${getStatusStyle(rfp.status)}`}>
-                      {rfp.status}
+                      {RfpStatusLabel[rfp.status] || rfp.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-gray-600 text-sm">

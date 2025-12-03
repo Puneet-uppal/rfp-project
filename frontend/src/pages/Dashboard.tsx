@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { rfpApi, vendorApi } from '../services/api';
-import { RfpStatus } from '../types';
+import { RfpStatus, RfpStatusLabel } from '../types';
 import type { Rfp, Vendor } from '../types';
 
 export default function Dashboard() {
@@ -133,7 +133,7 @@ export default function Dashboard() {
                     rfp.status === RfpStatus.CLOSED ? 'bg-purple-50 text-purple-700 border-purple-400' :
                     'bg-gray-50 text-gray-600 border-gray-300'
                   }`}>
-                    {rfp.status}
+                    {RfpStatusLabel[rfp.status] || rfp.status}
                   </span>
                 </div>
               </Link>

@@ -7,6 +7,16 @@ export enum RfpStatus {
   CLOSED = 'closed',
 }
 
+// Display labels for RFP statuses
+export const RfpStatusLabel: Record<RfpStatus, string> = {
+  [RfpStatus.DRAFT]: 'Draft',
+  [RfpStatus.PUBLISHED]: 'Published',
+  [RfpStatus.SENT]: 'Sent',
+  [RfpStatus.EVALUATING]: 'Evaluating',
+  [RfpStatus.AWARDED]: 'Deal Sold',
+  [RfpStatus.CLOSED]: 'Closed',
+};
+
 export enum ProposalStatus {
   RECEIVED = 'received',
   PARSING = 'parsing',
