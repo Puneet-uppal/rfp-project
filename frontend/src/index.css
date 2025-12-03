@@ -2,12 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-violet-50 text-violet-950;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.01em;
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
 }
 
 /* Smooth scroll behavior */
@@ -15,10 +18,10 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Modern custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,12 +29,15 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c4b5fd;
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a78bfa;
+  background: rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
 }
 
 /* Animated border shimmer effect for speech recognition */
@@ -48,11 +54,11 @@ html {
   animation: shimmer 2s linear infinite;
 }
 
-/* Smooth fade-in animation */
+/* Modern animations */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -60,10 +66,66 @@ html {
   }
 }
 
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-in {
-  animation: fade-in 0.5s ease-out;
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fade-in {
-  animation: fade-in 0.5s ease-out;
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-up {
+  animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Modern card shadow utilities */
+.shadow-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-elevated {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Professional table styles */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Smooth focus states */
+*:focus-visible {
+  outline: 2px solid rgba(76, 29, 149, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

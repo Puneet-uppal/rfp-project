@@ -8,26 +8,43 @@ const navigation = [
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-violet-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-violet-100 shadow-sm sticky top-0 z-50 backdrop-blur-sm bg-white/95">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-lg font-semibold text-violet-950 tracking-tight">RFP Manager</h1>
+            <div className="flex items-center gap-8">
+              <h1 className="text-lg font-semibold tracking-tight text-gray-900">RFP Manager</h1>
+              <nav className="hidden md:flex items-center gap-1">
+                {navigation.map((item) => (
+                  <NavLink
+                    key={item.name}
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                        isActive
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`
+                    }
+                  >
+                    {item.name}
+                  </NavLink>
+                ))}
+              </nav>
             </div>
-            <nav className="flex space-x-1">
+            <nav className="flex md:hidden items-center gap-1">
               {navigation.map((item) => (
                 <NavLink
                   key={item.name}
                   to={item.href}
-                  className={({ isActive }) =>
-                    `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? 'bg-violet-950 text-white shadow-sm'
-                        : 'text-violet-700 hover:text-violet-950 hover:bg-violet-50'
-                    }`
-                  }
+                    className={({ isActive }) =>
+                      `px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                        isActive
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`
+                    }
                 >
                   {item.name}
                 </NavLink>
@@ -38,7 +55,7 @@ export default function Layout() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Outlet />
       </main>
     </div>
