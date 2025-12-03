@@ -12,12 +12,27 @@ export class VendorService {
   ) {}
 
   async create(createVendorDto: CreateVendorDto): Promise<Vendor> {
+    // Check for existing non-deleted vendor with same email
     const existing = await this.vendorModel.findOne({
-      where: { email: createVendorDto.email },
+      where: { email: createVendorDto.email, isDeleted: false },
     });
 
     if (existing) {
       throw new ConflictException('A vendor with this email already exists');
+    }
+
+    // Check if there's a soft-deleted vendor with the same email - reactivate it
+    const deletedVendor = await this.vendorModel.findOne({
+      where: { email: createVendorDto.email, isDeleted: true },
+    });
+
+    if (deletedVendor) {
+      await deletedVendor.update({
+        ...createVendorDto,
+        isDeleted: false,
+        isActive: true,
+      });
+      return deletedVendor;
     }
 
     return this.vendorModel.create(createVendorDto as any);
@@ -32,7 +47,9 @@ export class VendorService {
   }): Promise<{ vendors: Vendor[]; total: number }> {
     const { search, category, isActive, page = 1, limit = 20 } = options || {};
 
-    const where: any = {};
+    const where: any = {
+      isDeleted: false, // Always exclude soft-deleted vendors
+    };
 
     if (search) {
       where[Op.or] = [
@@ -61,7 +78,9 @@ export class VendorService {
   }
 
   async findOne(id: string): Promise<Vendor> {
-    const vendor = await this.vendorModel.findByPk(id);
+    const vendor = await this.vendorModel.findOne({
+      where: { id, isDeleted: false },
+    });
 
     if (!vendor) {
       throw new NotFoundException(`Vendor with ID ${id} not found`);
@@ -71,12 +90,14 @@ export class VendorService {
   }
 
   async findByEmail(email: string): Promise<Vendor | null> {
-    return this.vendorModel.findOne({ where: { email } });
+    return this.vendorModel.findOne({ 
+      where: { email, isDeleted: false } 
+    });
   }
 
   async findByIds(ids: string[]): Promise<Vendor[]> {
     return this.vendorModel.findAll({
-      where: { id: { [Op.in]: ids } },
+      where: { id: { [Op.in]: ids }, isDeleted: false },
     });
   }
 
@@ -85,7 +106,7 @@ export class VendorService {
 
     if (updateVendorDto.email && updateVendorDto.email !== vendor.email) {
       const existing = await this.vendorModel.findOne({
-        where: { email: updateVendorDto.email },
+        where: { email: updateVendorDto.email, isDeleted: false },
       });
 
       if (existing) {
@@ -99,13 +120,17 @@ export class VendorService {
 
   async remove(id: string): Promise<void> {
     const vendor = await this.findOne(id);
-    await vendor.destroy();
+    // Soft delete - set isDeleted to true instead of destroying
+    await vendor.update({ isDeleted: true });
   }
 
   async getCategories(): Promise<string[]> {
     const result = await this.vendorModel.findAll({
       attributes: ['category'],
-      where: { category: { [Op.ne]: null } },
+      where: { 
+        category: { [Op.ne]: null },
+        isDeleted: false, // Exclude deleted vendors
+      },
       group: ['category'],
     });
 

@@ -1,14 +1,23 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters';
+import { SERVER, API } from './config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'],
+  });
+
+  // Global exception filter - catches all unhandled errors
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Enable CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: SERVER.FRONTEND_URL,
     credentials: true,
   });
 
@@ -22,7 +31,7 @@ async function bootstrap() {
   );
 
   // API prefix
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(API.PREFIX);
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -37,14 +46,38 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup(API.DOCS_PATH, app, document);
 
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
+  // Graceful shutdown handling
+  const signals = ['SIGTERM', 'SIGINT'];
+  signals.forEach((signal) => {
+    process.on(signal, async () => {
+      logger.log(`Received ${signal}, starting graceful shutdown...`);
+      await app.close();
+      logger.log('Application closed gracefully');
+      process.exit(0);
+    });
+  });
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', error);
+    // Don't exit - let the app continue running
+  });
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Don't exit - let the app continue running
+  });
+
+  await app.listen(SERVER.PORT);
+
+  logger.log(`Application is running on: http://localhost:${SERVER.PORT}`);
+  logger.log(`API Documentation: http://localhost:${SERVER.PORT}/${API.DOCS_PATH}`);
 }
 
-bootstrap();
-
+bootstrap().catch((error) => {
+  console.error('Failed to start application:', error);
+  process.exit(1);
+});

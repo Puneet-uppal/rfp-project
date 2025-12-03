@@ -37,10 +37,10 @@ export class ProposalService implements OnModuleInit {
   onModuleInit() {
     this.emailService.on('email', async (email: EmailMessage) => {
       try {
-        // Quick check: Only process if sender is a known vendor
+        // Quick check: Only process if sender is a known vendor (not deleted)
         const senderEmail = this.extractEmailAddress(email.from);
         const vendor = await this.vendorModel.findOne({
-          where: { email: senderEmail },
+          where: { email: senderEmail, isDeleted: false },
         });
         
         if (!vendor) {
@@ -66,7 +66,7 @@ export class ProposalService implements OnModuleInit {
     this.logger.log(`Extracted sender email: ${senderEmail}`);
     
     const vendor = await this.vendorModel.findOne({
-      where: { email: senderEmail },
+      where: { email: senderEmail, isDeleted: false },
     });
 
     if (!vendor) {

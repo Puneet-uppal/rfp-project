@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
-import databaseConfig from './config/database.config';
-import emailConfig from './config/email.config';
-import aiConfig from './config/ai.config';
+import { databaseConfig, emailConfig, aiConfig, SERVER } from './config';
 
 import { Rfp, RfpItem, Vendor, RfpVendor, Proposal, ProposalItem } from './database/models';
 
@@ -32,9 +30,9 @@ import { AiModule } from './modules/ai/ai.module';
         database: configService.get('database.database'),
         models: [Rfp, RfpItem, Vendor, RfpVendor, Proposal, ProposalItem],
         autoLoadModels: true,
-        synchronize: process.env.NODE_ENV === 'development',
-        sync: { alter: process.env.NODE_ENV === 'development' },
-        logging: process.env.NODE_ENV === 'development' ? console.log : false,
+        synchronize: SERVER.IS_DEVELOPMENT,
+        sync: { alter: SERVER.IS_DEVELOPMENT },
+        logging: SERVER.IS_DEVELOPMENT ? console.log : false,
       }),
       inject: [ConfigService],
     }),

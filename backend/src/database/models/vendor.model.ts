@@ -46,6 +46,10 @@ export class Vendor extends Model {
   @Column({ type: DataType.BOOLEAN })
   isActive: boolean;
 
+  @Default(false)
+  @Column({ type: DataType.BOOLEAN })
+  isDeleted: boolean;
+
   @CreatedAt
   createdAt: Date;
 

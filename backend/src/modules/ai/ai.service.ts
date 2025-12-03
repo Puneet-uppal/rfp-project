@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { DEFAULTS } from '../../config';
 
 export interface ParsedRfp {
   title: string;
@@ -78,12 +79,34 @@ export class AiService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private async generateJSON<T>(prompt: string, maxRetries = 5): Promise<T> {
+  private isRetryableError(error: Error): boolean {
+    const errorMessage = error.message || '';
+    return (
+      errorMessage.includes('429') ||
+      errorMessage.includes('Too Many Requests') ||
+      errorMessage.includes('Resource exhausted') ||
+      errorMessage.includes('ECONNRESET') ||
+      errorMessage.includes('ETIMEDOUT') ||
+      errorMessage.includes('ENOTFOUND') ||
+      errorMessage.includes('503') ||
+      errorMessage.includes('Service Unavailable') ||
+      errorMessage.includes('network') ||
+      errorMessage.includes('socket hang up')
+    );
+  }
+
+  private async generateJSON<T>(prompt: string, maxRetries = DEFAULTS.AI_MAX_RETRIES): Promise<T> {
     if (!this.genAI) {
-      throw new Error('Gemini API not configured');
+      throw new Error('Gemini API not configured. Please check your API key configuration.');
     }
 
-    const model = this.genAI.getGenerativeModel({ model: this.model });
+    let model;
+    try {
+      model = this.genAI.getGenerativeModel({ model: this.model });
+    } catch (error) {
+      this.logger.error('Failed to initialize AI model:', error);
+      throw new Error('Failed to initialize AI service. Please check configuration.');
+    }
     
     let lastError: Error | null = null;
     
@@ -92,6 +115,10 @@ export class AiService {
         const result = await model.generateContent(prompt);
         const response = result.response;
         const text = response.text();
+        
+        if (!text || text.trim() === '') {
+          throw new Error('AI returned empty response');
+        }
         
         // Extract JSON from response (handle markdown code blocks)
         let jsonStr = text;
@@ -106,26 +133,47 @@ export class AiService {
           }
         }
         
-        return JSON.parse(jsonStr) as T;
+        try {
+          return JSON.parse(jsonStr) as T;
+        } catch (parseError) {
+          this.logger.warn(`Failed to parse AI response as JSON (attempt ${attempt + 1}/${maxRetries})`);
+          this.logger.debug('Raw response:', text.substring(0, 500));
+          
+          // Retry on JSON parse errors (AI sometimes returns malformed JSON)
+          if (attempt < maxRetries - 1) {
+            await this.sleep(2000);
+            continue;
+          }
+          throw new Error('AI returned invalid response format. Please try again.');
+        }
       } catch (error) {
         lastError = error;
-        
-        // Check if it's a rate limit error (429)
         const errorMessage = error.message || '';
-        if (errorMessage.includes('429') || errorMessage.includes('Too Many Requests') || errorMessage.includes('Resource exhausted')) {
-          const backoffSchedule = [1000, 30000, 60000, 90000]; // 1s, 30s, 60s, 90s
-          const backoffMs = backoffSchedule[Math.min(attempt, backoffSchedule.length - 1)]; // Cap at 90s
-          this.logger.warn(`Rate limited (attempt ${attempt + 1}/${maxRetries}). Retrying in ${backoffMs / 1000}s...`);
+        
+        // Check if it's a retryable error
+        if (this.isRetryableError(error)) {
+          const backoffMs = DEFAULTS.AI_BACKOFF_SCHEDULE_MS[Math.min(attempt, DEFAULTS.AI_BACKOFF_SCHEDULE_MS.length - 1)];
+          this.logger.warn(`AI service error (attempt ${attempt + 1}/${maxRetries}): ${errorMessage.substring(0, 100)}`);
+          this.logger.warn(`Retrying in ${backoffMs / 1000}s...`);
           await this.sleep(backoffMs);
-        } else {
-          // For non-rate-limit errors, throw immediately
-          throw error;
+        } else if (errorMessage.includes('API key')) {
+          // Don't retry API key errors
+          throw new Error('AI service authentication failed. Please contact support.');
+        } else if (errorMessage.includes('blocked') || errorMessage.includes('safety')) {
+          // Don't retry content policy errors
+          throw new Error('Request could not be processed due to content policy. Please modify your input.');
+        } else if (!errorMessage.includes('invalid response format')) {
+          // Log unexpected errors but continue retrying
+          this.logger.error(`Unexpected AI error (attempt ${attempt + 1}/${maxRetries}):`, error);
+          if (attempt < maxRetries - 1) {
+            await this.sleep(5000);
+          }
         }
       }
     }
     
-    this.logger.error(`Failed after ${maxRetries} attempts due to rate limiting`);
-    throw lastError;
+    this.logger.error(`AI service failed after ${maxRetries} attempts`);
+    throw lastError || new Error('AI service is temporarily unavailable. Please try again later.');
   }
 
   /**

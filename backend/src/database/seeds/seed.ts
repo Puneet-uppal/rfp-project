@@ -6,22 +6,23 @@ import { RfpItem } from '../models/rfp-item.model';
 import { RfpVendor } from '../models/rfp-vendor.model';
 import { Proposal } from '../models/proposal.model';
 import { ProposalItem } from '../models/proposal-item.model';
+import { DATABASE } from '../../config/constants';
 
 config();
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
-  host: process.env.DATABASE_HOST || 'localhost',
-  port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-  username: process.env.DATABASE_USERNAME || 'postgres',
-  password: process.env.DATABASE_PASSWORD || 'postgres',
-  database: process.env.DATABASE_NAME || 'rfp_management',
+  host: DATABASE.HOST,
+  port: DATABASE.PORT,
+  username: DATABASE.USERNAME,
+  password: DATABASE.PASSWORD,
+  database: DATABASE.NAME,
   models: [Vendor, Rfp, RfpItem, RfpVendor, Proposal, ProposalItem],
   logging: false,
 });
 
 async function seed() {
-  console.log('🌱 Starting database seed...');
+  console.log('Starting database seed...');
 
   await sequelize.sync();
 
@@ -81,17 +82,17 @@ async function seed() {
 
     if (!existing) {
       await Vendor.create(vendorData as any);
-      console.log(`✅ Created vendor: ${vendorData.companyName}`);
+      console.log(`Created vendor: ${vendorData.companyName}`);
     } else {
-      console.log(`⏭️  Vendor already exists: ${vendorData.companyName}`);
+      console.log(`Vendor already exists: ${vendorData.companyName}`);
     }
   }
 
-  console.log('🎉 Seed completed successfully!');
+  console.log('Seed completed successfully!');
   await sequelize.close();
 }
 
 seed().catch((error) => {
-  console.error('❌ Seed failed:', error);
+  console.error('Seed failed:', error);
   process.exit(1);
 });

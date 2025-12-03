@@ -4,6 +4,7 @@ import * as nodemailer from 'nodemailer';
 import * as Imap from 'imap';
 import { simpleParser, ParsedMail, Attachment } from 'mailparser';
 import { EventEmitter } from 'events';
+import { DEFAULTS } from '../../config';
 
 export interface EmailMessage {
   messageId: string;
@@ -49,9 +50,20 @@ export class EmailService extends EventEmitter implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.initializeSmtp();
-    // IMAP polling starts automatically on server start
-    this.startImapPolling();
+    try {
+      await this.initializeSmtp();
+    } catch (error) {
+      this.logger.error('Failed to initialize SMTP:', error.message);
+      // Don't throw - allow app to continue without email
+    }
+    
+    // IMAP polling starts automatically on server start (wrapped in try-catch)
+    try {
+      this.startImapPolling();
+    } catch (error) {
+      this.logger.error('Failed to start IMAP polling:', error.message);
+      // Don't throw - allow app to continue without IMAP
+    }
   }
 
   private async initializeSmtp() {
@@ -70,75 +82,116 @@ export class EmailService extends EventEmitter implements OnModuleInit {
       return;
     }
 
-    this.transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: smtpConfig.secure,
-      auth: {
-        user: smtpConfig.user,
-        pass: smtpConfig.password,
-      },
-    });
-
     try {
+      this.transporter = nodemailer.createTransport({
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.secure,
+        auth: {
+          user: smtpConfig.user,
+          pass: smtpConfig.password,
+        },
+        connectionTimeout: DEFAULTS.SMTP_CONNECTION_TIMEOUT_MS,
+        greetingTimeout: DEFAULTS.SMTP_GREETING_TIMEOUT_MS,
+        socketTimeout: DEFAULTS.SMTP_SOCKET_TIMEOUT_MS,
+      });
+
       await this.transporter.verify();
       this.logger.log('✓ SMTP connection verified successfully!');
     } catch (error) {
       this.logger.error('✗ SMTP verification failed:', error.message);
+      // Don't throw - transporter might still work for sending
     }
   }
 
   /**
-   * Send an email
+   * Send an email with retry logic
    */
-  async sendEmail(options: SendEmailOptions): Promise<{ messageId: string; success: boolean }> {
+  async sendEmail(options: SendEmailOptions, maxRetries = DEFAULTS.EMAIL_SEND_MAX_RETRIES): Promise<{ messageId: string; success: boolean }> {
     this.logger.log(`[EMAIL] Preparing to send email...`);
     this.logger.log(`[EMAIL] To: ${Array.isArray(options.to) ? options.to.join(', ') : options.to}`);
     this.logger.log(`[EMAIL] Subject: ${options.subject}`);
     
     if (!this.transporter) {
       this.logger.error('[EMAIL] SMTP transporter not configured!');
-      throw new Error('SMTP not configured');
+      throw new Error('Email service is not configured. Please contact support.');
     }
 
     const fromConfig = this.configService.get('email.from');
+    if (!fromConfig?.email) {
+      throw new Error('Email sender not configured. Please contact support.');
+    }
+    
     this.logger.log(`[EMAIL] From: "${fromConfig?.name}" <${fromConfig?.email}>`);
     
-    try {
-      const mailOptions = {
-        from: `"${fromConfig.name}" <${fromConfig.email}>`,
-        to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
-        attachments: options.attachments,
-        replyTo: options.replyTo,
-        references: options.references,
-        inReplyTo: options.inReplyTo,
-      };
+    const mailOptions = {
+      from: `"${fromConfig.name}" <${fromConfig.email}>`,
+      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+      attachments: options.attachments,
+      replyTo: options.replyTo,
+      references: options.references,
+      inReplyTo: options.inReplyTo,
+    };
 
-      this.logger.log(`[EMAIL] Sending via SMTP...`);
-      const result = await this.transporter.sendMail(mailOptions);
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        this.logger.log(`[EMAIL] Sending via SMTP (attempt ${attempt + 1}/${maxRetries})...`);
+        const result = await this.transporter.sendMail(mailOptions);
 
-      this.logger.log(`[EMAIL] ✓ Email sent successfully!`);
-      this.logger.log(`[EMAIL] Message ID: ${result.messageId}`);
-      this.logger.log(`[EMAIL] Response: ${result.response}`);
-      this.logger.log(`[EMAIL] Accepted: ${JSON.stringify(result.accepted)}`);
-      this.logger.log(`[EMAIL] Rejected: ${JSON.stringify(result.rejected)}`);
-      
-      return { messageId: result.messageId, success: true };
-    } catch (error) {
-      this.logger.error(`[EMAIL] ✗ Failed to send email!`);
-      this.logger.error(`[EMAIL] Error: ${error.message}`);
-      this.logger.error(`[EMAIL] Stack: ${error.stack}`);
-      throw error;
+        this.logger.log(`[EMAIL] ✓ Email sent successfully!`);
+        this.logger.log(`[EMAIL] Message ID: ${result.messageId}`);
+        this.logger.log(`[EMAIL] Response: ${result.response}`);
+        this.logger.log(`[EMAIL] Accepted: ${JSON.stringify(result.accepted)}`);
+        this.logger.log(`[EMAIL] Rejected: ${JSON.stringify(result.rejected)}`);
+        
+        return { messageId: result.messageId, success: true };
+      } catch (error) {
+        lastError = error;
+        this.logger.error(`[EMAIL] ✗ Attempt ${attempt + 1} failed: ${error.message}`);
+        
+        // Check if error is retryable
+        const isRetryable = 
+          error.message?.includes('ECONNRESET') ||
+          error.message?.includes('ETIMEDOUT') ||
+          error.message?.includes('ECONNREFUSED') ||
+          error.message?.includes('socket hang up') ||
+          error.code === 'ESOCKET';
+        
+        if (isRetryable && attempt < maxRetries - 1) {
+          const waitTime = (attempt + 1) * 2000; // 2s, 4s, 6s
+          this.logger.log(`[EMAIL] Retrying in ${waitTime / 1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else if (!isRetryable) {
+          // Non-retryable error - throw immediately
+          break;
+        }
+      }
     }
+    
+    this.logger.error(`[EMAIL] ✗ Failed to send email after ${maxRetries} attempts`);
+    
+    // Provide user-friendly error messages
+    const errorMessage = lastError?.message || '';
+    if (errorMessage.includes('Invalid login') || errorMessage.includes('authentication')) {
+      throw new Error('Email authentication failed. Please contact support.');
+    } else if (errorMessage.includes('ECONNREFUSED')) {
+      throw new Error('Unable to connect to email server. Please try again later.');
+    } else if (errorMessage.includes('ETIMEDOUT')) {
+      throw new Error('Email server connection timed out. Please try again later.');
+    }
+    
+    throw new Error('Failed to send email. Please try again later.');
   }
 
   /**
    * Start polling IMAP for new emails
    */
-  async startImapPolling(intervalMs: number = 60000) {
+  async startImapPolling(intervalMs: number = DEFAULTS.IMAP_POLL_INTERVAL_MS) {
     const imapConfig = this.configService.get('email.imap');
     
     this.logger.log('========== STARTING IMAP POLLING ==========');
@@ -153,14 +206,24 @@ export class EmailService extends EventEmitter implements OnModuleInit {
       return;
     }
 
-    // Initial fetch
+    // Initial fetch (wrapped in try-catch)
     this.logger.log('Performing initial email fetch...');
-    await this.fetchNewEmails();
-
-    // Set up polling
-    this.pollingInterval = setInterval(async () => {
-      this.logger.log('[POLL] Checking for new emails...');
+    try {
       await this.fetchNewEmails();
+    } catch (error) {
+      this.logger.error('[IMAP] Initial fetch failed:', error.message);
+      // Continue anyway - polling will retry
+    }
+
+    // Set up polling with error handling
+    this.pollingInterval = setInterval(async () => {
+      try {
+        this.logger.log('[POLL] Checking for new emails...');
+        await this.fetchNewEmails();
+      } catch (error) {
+        this.logger.error('[POLL] Email fetch failed:', error.message);
+        // Don't throw - let polling continue
+      }
     }, intervalMs);
 
     this.logger.log(`✓ IMAP polling started successfully!`);
@@ -191,7 +254,39 @@ export class EmailService extends EventEmitter implements OnModuleInit {
 
     this.logger.log('[IMAP] Connecting to mail server...');
 
+    // Add connection timeout
+    const connectionTimeout = DEFAULTS.IMAP_CONNECTION_TIMEOUT_MS;
+    
     return new Promise((resolve, reject) => {
+      let timeoutHandle: NodeJS.Timeout;
+      let isResolved = false;
+      
+      const cleanup = () => {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+      };
+      
+      const safeResolve = (value: EmailMessage[]) => {
+        if (!isResolved) {
+          isResolved = true;
+          cleanup();
+          resolve(value);
+        }
+      };
+      
+      const safeReject = (error: Error) => {
+        if (!isResolved) {
+          isResolved = true;
+          cleanup();
+          reject(error);
+        }
+      };
+      
+      // Set connection timeout
+      timeoutHandle = setTimeout(() => {
+        this.logger.error('[IMAP] Connection timeout');
+        safeReject(new Error('IMAP connection timeout'));
+      }, connectionTimeout);
+      
       const imap = new Imap({
         user: imapConfig.user,
         password: imapConfig.password,
@@ -199,6 +294,8 @@ export class EmailService extends EventEmitter implements OnModuleInit {
         port: imapConfig.port,
         tls: imapConfig.tls,
         tlsOptions: { rejectUnauthorized: false },
+        connTimeout: DEFAULTS.IMAP_CONN_TIMEOUT_MS,
+        authTimeout: DEFAULTS.IMAP_AUTH_TIMEOUT_MS,
       });
 
       const emails: EmailMessage[] = [];
@@ -208,8 +305,8 @@ export class EmailService extends EventEmitter implements OnModuleInit {
         imap.openBox('INBOX', false, (err, box) => {
           if (err) {
             this.logger.error('[IMAP] ✗ Failed to open INBOX:', err.message);
-            imap.end();
-            reject(err);
+            try { imap.end(); } catch (e) { /* ignore */ }
+            safeReject(err);
             return;
           }
 
@@ -239,27 +336,51 @@ export class EmailService extends EventEmitter implements OnModuleInit {
               this.logger.log('[IMAP] Trying simpler search...');
               imap.search(['UNSEEN', ['SINCE', sinceStr]], (fallbackErr, fallbackResults) => {
                 if (fallbackErr) {
-                  imap.end();
-                  reject(fallbackErr);
+                  try { imap.end(); } catch (e) { /* ignore */ }
+                  safeReject(fallbackErr);
                   return;
                 }
-                this.processSearchResults(imap, fallbackResults || [], emails, resolve);
+                this.processSearchResultsSafe(imap, fallbackResults || [], emails, safeResolve);
               });
               return;
             }
 
-            this.processSearchResults(imap, results || [], emails, resolve);
+            this.processSearchResultsSafe(imap, results || [], emails, safeResolve);
           });
         });
       });
 
       imap.once('error', (imapErr: Error) => {
         this.logger.error('[IMAP] ✗ Connection error:', imapErr.message);
-        reject(imapErr);
+        safeReject(imapErr);
       });
 
-      imap.connect();
+      imap.once('end', () => {
+        this.logger.log('[IMAP] Connection ended');
+      });
+
+      try {
+        imap.connect();
+      } catch (error) {
+        this.logger.error('[IMAP] ✗ Failed to initiate connection:', error.message);
+        safeReject(error);
+      }
     });
+  }
+
+  private processSearchResultsSafe(
+    imap: Imap,
+    results: number[],
+    emails: EmailMessage[],
+    resolve: (emails: EmailMessage[]) => void,
+  ): void {
+    try {
+      this.processSearchResults(imap, results, emails, resolve);
+    } catch (error) {
+      this.logger.error('[IMAP] Error processing search results:', error.message);
+      try { imap.end(); } catch (e) { /* ignore */ }
+      resolve([]); // Return empty array on error
+    }
   }
 
   private processSearchResults(

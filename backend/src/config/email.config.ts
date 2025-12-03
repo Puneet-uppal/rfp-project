@@ -1,24 +1,24 @@
 import { registerAs } from '@nestjs/config';
+import { SMTP, IMAP, EMAIL_FROM, EMAIL_WEBHOOK } from './constants';
 
 export default registerAs('email', () => ({
   smtp: {
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    user: process.env.SMTP_USER,
-    password: process.env.SMTP_PASSWORD,
+    host: SMTP.HOST,
+    port: SMTP.PORT,
+    secure: SMTP.SECURE,
+    user: SMTP.USER,
+    password: SMTP.PASSWORD,
   },
   imap: {
-    host: process.env.IMAP_HOST || 'imap.gmail.com',
-    port: parseInt(process.env.IMAP_PORT || '993', 10),
-    user: process.env.IMAP_USER,
-    password: process.env.IMAP_PASSWORD,
-    tls: process.env.IMAP_TLS !== 'false',
+    host: IMAP.HOST,
+    port: IMAP.PORT,
+    user: IMAP.USER,
+    password: IMAP.PASSWORD,
+    tls: IMAP.TLS,
   },
   from: {
-    email: process.env.EMAIL_FROM,
-    name: process.env.EMAIL_FROM_NAME || 'RFP Management System',
+    email: EMAIL_FROM.EMAIL,
+    name: EMAIL_FROM.NAME,
   },
-  webhookSecret: process.env.EMAIL_WEBHOOK_SECRET,
+  webhookSecret: EMAIL_WEBHOOK.SECRET,
 }));
-
