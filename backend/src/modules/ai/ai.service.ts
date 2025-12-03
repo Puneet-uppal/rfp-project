@@ -112,29 +112,29 @@ export class AiService {
     
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
         
         if (!text || text.trim() === '') {
           throw new Error('AI returned empty response');
         }
-        
-        // Extract JSON from response (handle markdown code blocks)
-        let jsonStr = text;
-        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-        if (jsonMatch) {
-          jsonStr = jsonMatch[1].trim();
-        } else {
-          // Try to find JSON object directly
-          const objMatch = text.match(/\{[\s\S]*\}/);
-          if (objMatch) {
-            jsonStr = objMatch[0];
-          }
-        }
-        
+    
+    // Extract JSON from response (handle markdown code blocks)
+    let jsonStr = text;
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1].trim();
+    } else {
+      // Try to find JSON object directly
+      const objMatch = text.match(/\{[\s\S]*\}/);
+      if (objMatch) {
+        jsonStr = objMatch[0];
+      }
+    }
+    
         try {
-          return JSON.parse(jsonStr) as T;
+    return JSON.parse(jsonStr) as T;
         } catch (parseError) {
           this.logger.warn(`Failed to parse AI response as JSON (attempt ${attempt + 1}/${maxRetries})`);
           this.logger.debug('Raw response:', text.substring(0, 500));
