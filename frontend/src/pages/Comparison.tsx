@@ -72,7 +72,7 @@ export default function Comparison() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
         <p className="text-gray-600">Loading comparison data...</p>
       </div>
     );
@@ -86,7 +86,7 @@ export default function Comparison() {
         <p className="text-gray-500">Comparison: {comparison ? 'Loaded' : 'Not loaded'}</p>
         <button 
           onClick={() => navigate(`/rfps/${id}`)} 
-          className="mt-4 text-blue-600 hover:underline"
+          className="mt-4 text-violet-950 hover:underline"
         >
           ← Back to RFP
         </button>
@@ -97,7 +97,7 @@ export default function Comparison() {
   if (!comparison.proposals || comparison.proposals.length === 0) {
     return (
       <div className="space-y-6">
-        <button onClick={() => navigate(`/rfps/${id}`)} className="text-blue-600 hover:underline">
+        <button onClick={() => navigate(`/rfps/${id}`)} className="text-violet-950 hover:underline">
           ← Back to RFP
         </button>
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
@@ -115,7 +115,7 @@ export default function Comparison() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <button onClick={() => navigate(`/rfps/${id}`)} className="text-blue-600 hover:underline mb-2">
+          <button onClick={() => navigate(`/rfps/${id}`)} className="text-violet-950 hover:underline mb-2">
             ← Back to RFP
           </button>
           <h1 className="text-2xl font-bold text-gray-900">Proposal Comparison</h1>
@@ -124,7 +124,7 @@ export default function Comparison() {
         <button
           onClick={handleGetRecommendation}
           disabled={loadingRecommendation}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="bg-violet-950 text-white px-4 py-2 rounded-md hover:bg-violet-900 disabled:opacity-50"
         >
           {loadingRecommendation ? 'Analyzing...' : 'Get AI Recommendation'}
         </button>
@@ -198,7 +198,7 @@ export default function Comparison() {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleSelectDealClick(proposal.id, proposal.vendorName)}
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-violet-950 hover:underline text-sm"
                     >
                       Select Deal
                     </button>

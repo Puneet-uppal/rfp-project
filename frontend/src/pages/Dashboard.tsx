@@ -35,109 +35,144 @@ export default function Dashboard() {
     { 
       name: 'Total RFPs', 
       value: rfps.length,
-      icon: '📋',
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-400',
-      textColor: 'text-blue-700',
+      color: 'from-violet-950 to-violet-900',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-300',
+      textColor: 'text-violet-950',
     },
     { 
       name: 'Active Vendors', 
       value: vendors.filter(v => v.isActive).length,
-      icon: '🏢',
-      color: 'from-emerald-500 to-emerald-600',
-      bgColor: 'bg-emerald-50',
-      borderColor: 'border-emerald-400',
-      textColor: 'text-emerald-700',
+      color: 'from-violet-950 to-violet-900',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-300',
+      textColor: 'text-violet-950',
     },
     { 
       name: 'Pending Responses', 
       value: rfps.filter(r => r.status === RfpStatus.SENT).length,
-      icon: '⏳',
-      color: 'from-amber-500 to-amber-600',
-      bgColor: 'bg-amber-50',
-      borderColor: 'border-amber-400',
-      textColor: 'text-amber-700',
+      color: 'from-violet-950 to-violet-900',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-300',
+      textColor: 'text-violet-950',
     },
     { 
       name: 'Under Evaluation', 
       value: rfps.filter(r => r.status === RfpStatus.EVALUATING).length,
-      icon: '🔍',
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-400',
-      textColor: 'text-purple-700',
+      color: 'from-violet-950 to-violet-900',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-300',
+      textColor: 'text-violet-950',
     },
   ];
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    
+    // Normalize both dates to midnight in local timezone for accurate day comparison
+    const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Calculate difference in days
+    const diffTime = nowMidnight.getTime() - dateMidnight.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+  };
+
+  const formatCurrency = (amount: number, currency?: string) => {
+    return `${currency || ''} ${amount.toLocaleString()}`.trim();
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-semibold text-violet-950 tracking-tight">Dashboard</h1>
+          <p className="text-sm text-violet-600 mt-1">Overview of your RFP activities</p>
+        </div>
         <Link
           to="/rfps/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          className="bg-violet-950 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-900 transition-colors duration-150 shadow-sm hover:shadow"
         >
-          + Create RFP
+          Create RFP
         </Link>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
         {stats.map((stat) => (
           <div 
             key={stat.name} 
-            className={`${stat.bgColor} p-5 rounded-xl border-2 ${stat.borderColor} shadow-sm hover:shadow-md transition-all duration-200 group`}
+            className={`${stat.bgColor} p-6 rounded-lg border ${stat.borderColor} transition-all duration-200 hover:border-violet-400`}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm font-medium ${stat.textColor} opacity-80`}>{stat.name}</p>
-                <p className={`text-3xl font-bold ${stat.textColor} mt-1`}>{stat.value}</p>
-              </div>
-              <div className={`text-3xl opacity-70 group-hover:scale-110 transition-transform duration-200`}>
-                {stat.icon}
-              </div>
-            </div>
-            <div className={`mt-3 h-1 rounded-full bg-gradient-to-r ${stat.color} opacity-60`}></div>
+            <p className={`text-xs font-medium ${stat.textColor} uppercase tracking-wider mb-2`}>{stat.name}</p>
+            <p className={`text-3xl font-semibold ${stat.textColor} mb-3`}>{stat.value}</p>
+            <div className={`h-0.5 rounded-full bg-gradient-to-r ${stat.color}`}></div>
           </div>
         ))}
       </div>
 
       {/* Recent RFPs */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Recent RFPs</h2>
+      <div className="bg-white rounded-lg border border-violet-100 shadow-sm">
+        <div className="px-6 py-4 border-b border-violet-100">
+          <h2 className="text-lg font-semibold text-violet-950">Recent RFPs</h2>
         </div>
         {rfps.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No RFPs yet. <Link to="/rfps/create" className="text-blue-600 hover:underline">Create your first RFP</Link>
+          <div className="p-12 text-center">
+            <p className="text-violet-600 mb-2">No RFPs yet</p>
+            <Link to="/rfps/create" className="text-violet-950 hover:text-violet-900 font-medium text-sm">Create your first RFP</Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
-            {rfps.map((rfp) => (
-              <Link
-                key={rfp.id}
-                to={`/rfps/${rfp.id}`}
-                className="block p-4 hover:bg-gray-50"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-gray-900">{rfp.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{rfp.description.substring(0, 100)}...</p>
-                  </div>
-                  <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg border-2 uppercase tracking-wide ${
-                    rfp.status === RfpStatus.DRAFT ? 'bg-gray-50 text-gray-600 border-gray-300' :
-                    rfp.status === RfpStatus.SENT ? 'bg-amber-50 text-amber-700 border-amber-400' :
-                    rfp.status === RfpStatus.EVALUATING ? 'bg-blue-50 text-blue-700 border-blue-400' :
-                    rfp.status === RfpStatus.AWARDED ? 'bg-emerald-50 text-emerald-700 border-emerald-400' :
-                    rfp.status === RfpStatus.CLOSED ? 'bg-purple-50 text-purple-700 border-purple-400' :
-                    'bg-gray-50 text-gray-600 border-gray-300'
-                  }`}>
-                    {RfpStatusLabel[rfp.status] || rfp.status}
-                  </span>
-                </div>
-              </Link>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-violet-100">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-violet-700 uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-violet-700 uppercase tracking-wider">Open Since</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-violet-700 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-violet-700 uppercase tracking-wider">Budget</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-violet-50">
+                {rfps.map((rfp) => (
+                  <tr key={rfp.id} className="hover:bg-violet-50/50 transition-colors duration-150">
+                    <td className="px-6 py-4">
+                      <Link
+                        to={`/rfps/${rfp.id}`}
+                        className="text-sm font-medium text-violet-950 hover:text-violet-700 transition-colors"
+                      >
+                        {rfp.title}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-violet-600">
+                      {formatDate(rfp.createdAt)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-md ${
+                        rfp.status === RfpStatus.DRAFT ? 'bg-violet-100 text-violet-700' :
+                        rfp.status === RfpStatus.SENT ? 'bg-violet-200 text-violet-800' :
+                        rfp.status === RfpStatus.EVALUATING ? 'bg-violet-300 text-violet-950' :
+                        rfp.status === RfpStatus.AWARDED ? 'bg-violet-950 text-white' :
+                        rfp.status === RfpStatus.CLOSED ? 'bg-violet-800 text-white' :
+                        'bg-violet-100 text-violet-700'
+                      }`}>
+                        {RfpStatusLabel[rfp.status] || rfp.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-violet-950 font-medium text-right">
+                      {rfp.budget ? formatCurrency(rfp.budget, rfp.currency) : '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
