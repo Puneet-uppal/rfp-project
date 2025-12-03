@@ -3,6 +3,10 @@
  * Centralized access to all environment variables
  */
 
+// Load .env file BEFORE reading process.env values
+import { config } from 'dotenv';
+config();
+
 // Server Configuration
 export const SERVER = {
   PORT: parseInt(process.env.PORT || '3001', 10),
