@@ -179,9 +179,9 @@ export class RfpService {
     const rfp = await this.findOne(id);
     this.logger.log(`RFP found: "${rfp.title}" (Status: ${rfp.status})`);
 
-    if (rfp.status === RfpStatus.CLOSED || rfp.status === RfpStatus.AWARDED) {
+    if (rfp.status === RfpStatus.AWARDED) {
       this.logger.warn(`Cannot send RFP - status is ${rfp.status}`);
-      throw new BadRequestException('Cannot send a closed or awarded RFP');
+      throw new BadRequestException('Cannot send a deal that has already been sold');
     }
 
     const vendors = await this.vendorService.findByIds(sendDto.vendorIds);

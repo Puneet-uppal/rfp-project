@@ -23,7 +23,7 @@ export default function Layout() {
                     className={({ isActive }) =>
                       `px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-600 text-white shadow-sm'
+                          ? 'bg-slate-700 text-white shadow-sm'
                           : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                       }`
                     }
@@ -41,8 +41,8 @@ export default function Layout() {
                     className={({ isActive }) =>
                       `px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-600 text-white'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        ? 'bg-slate-700 text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                       }`
                     }
                 >

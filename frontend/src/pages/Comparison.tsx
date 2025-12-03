@@ -72,7 +72,7 @@ export default function Comparison() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700 mx-auto mb-4"></div>
         <p className="text-gray-600">Loading comparison data...</p>
       </div>
     );
@@ -86,7 +86,7 @@ export default function Comparison() {
         <p className="text-gray-500">Comparison: {comparison ? 'Loaded' : 'Not loaded'}</p>
         <button 
           onClick={() => navigate(`/rfps/${id}`)} 
-          className="mt-4 text-blue-600 hover:underline"
+          className="mt-4 text-slate-600 hover:underline"
         >
           ← Back to RFP
         </button>
@@ -97,7 +97,7 @@ export default function Comparison() {
   if (!comparison.proposals || comparison.proposals.length === 0) {
     return (
       <div className="space-y-6">
-        <button onClick={() => navigate(`/rfps/${id}`)} className="text-blue-600 hover:underline">
+        <button onClick={() => navigate(`/rfps/${id}`)} className="text-slate-600 hover:underline">
           ← Back to RFP
         </button>
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
@@ -115,7 +115,7 @@ export default function Comparison() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <button onClick={() => navigate(`/rfps/${id}`)} className="text-violet-950 hover:underline mb-2">
+          <button onClick={() => navigate(`/rfps/${id}`)} className="text-slate-600 hover:underline mb-2">
             ← Back to RFP
           </button>
           <h1 className="text-2xl font-bold text-gray-900">Proposal Comparison</h1>
@@ -124,7 +124,7 @@ export default function Comparison() {
         <button
           onClick={handleGetRecommendation}
           disabled={loadingRecommendation}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800 disabled:opacity-50"
         >
           {loadingRecommendation ? 'Analyzing...' : 'Get AI Recommendation'}
         </button>
@@ -132,11 +132,11 @@ export default function Comparison() {
 
       {/* AI Recommendation */}
       {comparison.aiRecommendation && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-blue-800 mb-2">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-slate-800 mb-2">
             🏆 AI Recommendation: {comparison.aiRecommendation.recommendedVendor}
           </h2>
-          <p className="text-blue-700 mb-4">{comparison.aiRecommendation.reasoning}</p>
+          <p className="text-slate-700 mb-4">{comparison.aiRecommendation.reasoning}</p>
           <div className="bg-white p-4 rounded-md">
             <p className="text-sm text-gray-600">{comparison.aiRecommendation.comparisonSummary}</p>
           </div>
@@ -159,28 +159,36 @@ export default function Comparison() {
             {comparison.proposals.map((proposal) => {
               const isRecommended = comparison.aiRecommendation?.recommendedVendor === proposal.vendorName;
               return (
-                <tr key={proposal.id} className={isRecommended ? 'bg-blue-50' : ''}>
+                <tr key={proposal.id} className={isRecommended ? 'bg-slate-50' : ''}>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       {isRecommended && <span className="mr-2">🏆</span>}
                       <div>
                         <p className="font-medium text-gray-900">{proposal.vendorName}</p>
-                        {isRecommended && <span className="text-xs text-blue-600">Recommended</span>}
+                        {isRecommended && <span className="text-xs text-slate-600">Recommended</span>}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-medium">{proposal.totalPrice ? `${proposal.currency || comparison.rfp.currency || ''} ${Number(proposal.totalPrice).toLocaleString()}` : '-'}</p>
-                    {comparison.rfp.budget && proposal.totalPrice && (
-                      <p className={`text-xs ${Number(proposal.totalPrice) <= Number(comparison.rfp.budget) ? 'text-blue-600' : 'text-red-600'}`}>
-                        {((Number(proposal.totalPrice) / Number(comparison.rfp.budget)) * 100).toFixed(0)}% of budget
-                      </p>
-                    )}
+                    {comparison.rfp.budget && proposal.totalPrice && (() => {
+                      const price = Number(proposal.totalPrice);
+                      const budget = Number(comparison.rfp.budget);
+                      const isWithinBudget = price <= budget;
+                      const displayText = isWithinBudget 
+                        ? `${((price / budget) * 100).toFixed(0)}% of budget`
+                        : `${(price / budget).toFixed(1)}x budget`;
+                      return (
+                        <p className={`text-xs ${isWithinBudget ? 'text-slate-600' : 'text-red-600'}`}>
+                          {displayText}
+                        </p>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-medium">{proposal.deliveryDays ? `${proposal.deliveryDays} days` : '-'}</p>
                     {comparison.rfp.deliveryDays && proposal.deliveryDays && (
-                      <p className={`text-xs ${Number(proposal.deliveryDays) <= Number(comparison.rfp.deliveryDays) ? 'text-blue-600' : 'text-red-600'}`}>
+                      <p className={`text-xs ${Number(proposal.deliveryDays) <= Number(comparison.rfp.deliveryDays) ? 'text-slate-600' : 'text-red-600'}`}>
                         {Number(proposal.deliveryDays) <= Number(comparison.rfp.deliveryDays) ? 'Meets requirement' : 'Exceeds'}
                       </p>
                     )}
@@ -188,7 +196,7 @@ export default function Comparison() {
                   <td className="px-6 py-4">
                     {proposal.score ? (
                       <span className={`font-bold text-lg ${
-                        Number(proposal.score) >= 80 ? 'text-blue-600' :
+                        Number(proposal.score) >= 80 ? 'text-slate-600' :
                         Number(proposal.score) >= 60 ? 'text-yellow-600' : 'text-red-600'
                       }`}>
                         {Number(proposal.score).toFixed(0)}
@@ -198,7 +206,7 @@ export default function Comparison() {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleSelectDealClick(proposal.id, proposal.vendorName)}
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-slate-600 hover:underline text-sm"
                     >
                       Select Deal
                     </button>
@@ -218,7 +226,7 @@ export default function Comparison() {
             
             {proposal.strengths && proposal.strengths.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-sm font-medium text-blue-600 mb-2">✓ Strengths</h4>
+                <h4 className="text-sm font-medium text-slate-600 mb-2">✓ Strengths</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   {proposal.strengths.map((s, i) => (
                     <li key={i}>• {s}</li>
@@ -273,8 +281,8 @@ export default function Comparison() {
       {dealConfirm.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-slate-100 rounded-full">
+              <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -291,7 +299,7 @@ export default function Comparison() {
               </button>
               <button
                 onClick={handleSelectDealConfirm}
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
               >
                 Confirm Deal
               </button>

@@ -18,8 +18,7 @@ export enum RfpStatus {
   PUBLISHED = 'published',
   SENT = 'sent',
   EVALUATING = 'evaluating',
-  AWARDED = 'awarded',
-  CLOSED = 'closed',
+  AWARDED = 'deal_sold',
 }
 
 @Table({ tableName: 'rfps', timestamps: true })

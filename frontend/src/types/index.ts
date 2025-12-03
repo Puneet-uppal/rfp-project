@@ -3,8 +3,7 @@ export enum RfpStatus {
   PUBLISHED = 'published',
   SENT = 'sent',
   EVALUATING = 'evaluating',
-  AWARDED = 'awarded',
-  CLOSED = 'closed',
+  AWARDED = 'deal_sold',
 }
 
 // Display labels for RFP statuses
@@ -14,7 +13,6 @@ export const RfpStatusLabel: Record<RfpStatus, string> = {
   [RfpStatus.SENT]: 'Sent',
   [RfpStatus.EVALUATING]: 'Evaluating',
   [RfpStatus.AWARDED]: 'Deal Sold',
-  [RfpStatus.CLOSED]: 'Closed',
 };
 
 export enum ProposalStatus {

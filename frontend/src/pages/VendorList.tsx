@@ -112,7 +112,7 @@ export default function VendorList() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-700 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -128,13 +128,13 @@ export default function VendorList() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <input
-          type="text"
-          placeholder="Search vendors..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-400 bg-white transition-all hover:border-gray-400"
-        />
+      <input
+        type="text"
+        placeholder="Search vendors..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-900 placeholder-gray-400 bg-white transition-all hover:border-gray-400"
+      />
       </div>
 
       {/* Vendor List */}
@@ -142,8 +142,8 @@ export default function VendorList() {
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-blue-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+              <div className="w-12 h-12 border-3 border-gray-200 border-t-slate-700 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-slate-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
             </div>
             <p className="text-sm text-gray-500 font-medium">Loading vendors...</p>
           </div>
@@ -159,7 +159,7 @@ export default function VendorList() {
           <p className="text-sm text-gray-500 mb-4">Get started by adding your first vendor</p>
           <button
             onClick={() => handleOpenModal()}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
           >
             Add Vendor
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -178,41 +178,41 @@ export default function VendorList() {
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Email</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
+              </tr>
+            </thead>
               <tbody className="divide-y divide-gray-100">
-                {vendors.map((vendor) => (
+              {vendors.map((vendor) => (
                   <tr key={vendor.id} className="group hover:bg-gray-50/80 transition-colors duration-150">
                     <td className="px-6 py-4 font-semibold text-gray-900">{vendor.companyName}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{vendor.contactPerson}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{vendor.email}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{vendor.category || '-'}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpenModal(vendor)}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                          title="Edit vendor"
-                        >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenModal(vendor)}
+                          className="p-2 text-gray-600 hover:text-slate-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                        title="Edit vendor"
+                      >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
+                        </svg>
+                      </button>
+                      <button
                           onClick={() => handleDeleteClick(vendor)}
                           className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
-                          title="Delete vendor"
-                        >
+                        title="Delete vendor"
+                      >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           </div>
         </div>
       )}
@@ -223,8 +223,8 @@ export default function VendorList() {
           <div className="bg-white rounded-2xl w-full max-w-2xl p-8 shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {editingVendor ? 'Edit Vendor' : 'Add Vendor'}
-              </h2>
+              {editingVendor ? 'Edit Vendor' : 'Add Vendor'}
+            </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -243,7 +243,7 @@ export default function VendorList() {
                     required
                     value={formData.companyName}
                     onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm transition-all"
                   />
                 </div>
                 <div>
@@ -253,7 +253,7 @@ export default function VendorList() {
                     required
                     value={formData.contactPerson}
                     onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm transition-all"
                   />
                 </div>
               </div>
@@ -264,7 +264,7 @@ export default function VendorList() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-5">
@@ -274,7 +274,7 @@ export default function VendorList() {
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm transition-all"
                   />
                 </div>
                 <div>
@@ -284,7 +284,7 @@ export default function VendorList() {
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="e.g., IT Equipment"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 transition-all"
                   />
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function VendorList() {
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 transition-all"
                 />
               </div>
               <div>
@@ -303,7 +303,7 @@ export default function VendorList() {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 transition-all resize-none"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
@@ -316,7 +316,7 @@ export default function VendorList() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {editingVendor ? 'Update Vendor' : 'Create Vendor'}
                 </button>
