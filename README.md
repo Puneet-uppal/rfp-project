@@ -20,6 +20,7 @@ A full-stack web application that streamlines the Request for Proposal (RFP) wor
    - CRUD operations for vendor contacts
    - Categorize vendors by type
    - Track vendor response history
+   - Soft delete support (data preservation)
 
 3. **Email Integration**
    - Send RFPs to multiple vendors via SMTP
@@ -120,6 +121,8 @@ This creates sample vendors for testing.
 
 ## Environment Variables
 
+All environment variables are centralized in `backend/src/config/constants.ts` for type safety and consistency.
+
 ### Backend (backend/.env)
 
 ```env
@@ -137,6 +140,7 @@ NODE_ENV=development
 # Google Gemini AI (FREE)
 # Get your key at: https://makersuite.google.com/app/apikey
 GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.0-flash
 
 # Email - SMTP (Sending)
 SMTP_HOST=smtp.gmail.com
@@ -157,6 +161,20 @@ IMAP_TLS=true
 # Frontend URL (CORS)
 FRONTEND_URL=http://localhost:3000
 ```
+
+### Configuration Constants
+
+The application uses a centralized constants file (`backend/src/config/constants.ts`) that provides:
+
+| Constant Group | Description |
+|----------------|-------------|
+| `SERVER` | Port, environment, frontend URL |
+| `DATABASE` | Host, port, credentials, database name |
+| `AI` | Gemini API key and model |
+| `SMTP` | Email sending configuration |
+| `IMAP` | Email receiving configuration |
+| `EMAIL_FROM` | Sender email and name |
+| `DEFAULTS` | Timeouts, retry limits, intervals |
 
 ### Getting a FREE Gemini API Key
 
@@ -203,11 +221,11 @@ http://localhost:3001/api/docs
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/vendors` | List all vendors |
+| GET | `/api/vendors` | List all vendors (excludes soft-deleted) |
 | POST | `/api/vendors` | Create vendor |
 | GET | `/api/vendors/:id` | Get vendor details |
 | PATCH | `/api/vendors/:id` | Update vendor |
-| DELETE | `/api/vendors/:id` | Delete vendor |
+| DELETE | `/api/vendors/:id` | Soft delete vendor (sets isDeleted=true) |
 
 #### Proposals
 
@@ -271,27 +289,44 @@ Using Google Gemini (free tier) for:
 - Graceful handling of network failures and API outages
 - User-friendly error messages
 
-### 3. Why Sequelize ORM?
+### 3. Centralized Configuration
+
+All environment variables are accessed through a constants file:
+- Single source of truth for configuration
+- Type-safe access (strings parsed to numbers/booleans)
+- Default values in one place
+- IDE autocomplete support
+- Easy to mock in tests
+
+### 4. Soft Delete Pattern
+
+Vendors use soft delete for data integrity:
+- `isDeleted` boolean field (default: false)
+- DELETE endpoint sets `isDeleted=true` instead of removing record
+- All GET endpoints filter out soft-deleted records
+- Preserves historical data and relationships
+
+### 5. Why Sequelize ORM?
 
 - More familiar API for developers coming from other frameworks
 - Excellent TypeScript support with decorators
 - Active community and good documentation
 - Easy model associations and migrations
 
-### 4. Why Google Gemini?
+### 6. Why Google Gemini?
 
 - 100% FREE - No credit card required
 - 60 requests/minute free tier (sufficient for this use case)
 - Comparable quality to GPT-4 for structured tasks
 - Fast response times with gemini-2.0-flash
 
-### 5. Email Architecture
+### 7. Email Architecture
 
 Two approaches supported:
 - **IMAP Polling**: Periodically check inbox for new responses (auto-starts with server, 60s interval)
 - **Webhook**: Real-time processing via services like SendGrid Inbound Parse
 
-### 6. Frontend Architecture
+### 8. Frontend Architecture
 
 - **Zustand** for lightweight state management
 - **Framer Motion** for smooth animations
@@ -332,35 +367,41 @@ Two approaches supported:
 ## Project Structure
 
 ```
-├── backend/
-│   ├── src/
-│   │   ├── common/           # Filters, guards, utilities
-│   │   ├── config/           # Configuration files
-│   │   ├── database/
-│   │   │   ├── models/       # Sequelize models
-│   │   │   └── seeds/        # Seed data
-│   │   └── modules/
-│   │       ├── ai/           # Google Gemini integration
-│   │       ├── comparison/   # Proposal comparison
-│   │       ├── email/        # Email send/receive
-│   │       ├── proposal/     # Vendor proposals
-│   │       ├── rfp/          # RFP management
-│   │       └── vendor/       # Vendor management
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/       # Reusable components
-│   │   ├── hooks/            # Custom hooks & store
-│   │   ├── pages/            # Page components
-│   │   ├── services/         # API client
-│   │   └── types/            # TypeScript types
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── .gitignore
-└── README.md
+backend/
+  src/
+    common/               # Filters, guards, utilities
+      filters/            # Exception filters
+    config/               # Configuration
+      constants.ts        # Centralized env variables
+      database.config.ts  # Database configuration
+      email.config.ts     # Email configuration
+      ai.config.ts        # AI configuration
+      index.ts            # Config exports
+    database/
+      models/             # Sequelize models
+      seeds/              # Seed data
+    modules/
+      ai/                 # Google Gemini integration
+      comparison/         # Proposal comparison
+      email/              # Email send/receive
+      proposal/           # Vendor proposals
+      rfp/                # RFP management
+      vendor/             # Vendor management
+  package.json
+  tsconfig.json
+
+frontend/
+  src/
+    components/           # Reusable components
+    hooks/                # Custom hooks & store
+    pages/                # Page components
+    services/             # API client
+    types/                # TypeScript types
+  package.json
+  vite.config.ts
+
+.gitignore
+README.md
 ```
 
 ## Running in Production
